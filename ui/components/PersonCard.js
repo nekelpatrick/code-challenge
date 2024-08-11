@@ -65,8 +65,8 @@ export const PersonCard = ({ person }) => {
       <h2 className="text-xl font-bold">
         {person.firstName} {person.lastName}
       </h2>
-      <p>Company: {person.company}</p>
-      <p>Title: {person.title}</p>
+      <p>Company: {person.companyName || 'N/A'}</p>
+      <p>Title: {person.title || 'N/A'}</p>
       <p>Check-in date: {formatDateTime(checkInTime)}</p>
       <p>Check-out date: {formatDateTime(person.checkOutDate)}</p>
       {renderButton()}

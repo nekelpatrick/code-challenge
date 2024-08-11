@@ -19,7 +19,7 @@ export const Summary = ({ selectedEvent }) => {
 
         const peopleByCompany = peopleData.reduce((acc, person) => {
           if (person.checkInDate) {
-            acc[person.company] = (acc[person.company] || 0) + 1;
+            acc[person.companyName] = (acc[person.companyName] || 0) + 1;
           }
           return acc;
         }, {});
@@ -40,7 +40,7 @@ export const Summary = ({ selectedEvent }) => {
 
   const renderCompanies = () =>
     Object.entries(summary.peopleByCompany)
-      .map(([company, count]) => `${company} (${count})`)
+      .map(([company, count]) => `${company || 'N/A'} (${count})`)
       .join(', ');
 
   return (
