@@ -11,5 +11,5 @@ Meteor.startup(async () => {
   Meteor.publish('communities', () => Communities.find());
 
   // Publish the People collection
-  Meteor.publish('people', (eventId) => People.find({ eventId }));
+  Meteor.publish('people', (communityId) => People.find({ communityId }));
 });

@@ -1,40 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useTracker } from 'meteor/react-meteor-data';
 import { People } from '../../people/people';
+import { Meteor } from 'meteor/meteor';
 
 export const Summary = ({ selectedEvent }) => {
-  const [summary, setSummary] = useState({
-    peopleCheckedIn: 0,
-    peopleByCompany: {},
-    peopleNotCheckedIn: 0,
-  });
-
-  useEffect(() => {
-    // Calculate summary data from the People collection based on the selected event
-    const calculateSummary = async () => {
-      const peopleData = People.find({ eventId: selectedEvent._id }).fetch();
-
-      const peopleCheckedIn = peopleData.filter(
-        (person) => person.checkInDate
-      ).length;
-      const peopleNotCheckedIn = peopleData.length - peopleCheckedIn;
-
-      const peopleByCompany = peopleData.reduce((acc, person) => {
-        if (person.checkInDate) {
-          acc[person.company] = (acc[person.company] || 0) + 1;
-        }
-        return acc;
-      }, {});
-
-      setSummary({
-        peopleCheckedIn,
-        peopleByCompany,
-        peopleNotCheckedIn,
-      });
-    };
-
+  const summary = useTracker(() => {
     if (selectedEvent) {
-      calculateSummary();
+      const handler = Meteor.subscribe('people', selectedEvent._id);
+      if (handler.ready()) {
+        const peopleData = People.find({
+          communityId: selectedEvent._id,
+        }).fetch();
+
+        const peopleCheckedIn = peopleData.filter(
+          (person) => person.checkInDate
+        ).length;
+        const peopleNotCheckedIn = peopleData.length - peopleCheckedIn;
+
+        const peopleByCompany = peopleData.reduce((acc, person) => {
+          if (person.checkInDate) {
+            acc[person.company] = (acc[person.company] || 0) + 1;
+          }
+          return acc;
+        }, {});
+
+        return {
+          peopleCheckedIn,
+          peopleByCompany,
+          peopleNotCheckedIn,
+        };
+      }
     }
+    return {
+      peopleCheckedIn: 0,
+      peopleByCompany: {},
+      peopleNotCheckedIn: 0,
+    };
   }, [selectedEvent]);
 
   const renderCompanies = () =>

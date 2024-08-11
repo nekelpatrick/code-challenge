@@ -1,21 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { People } from '../../people/people';
+import { useTracker } from 'meteor/react-meteor-data';
+import { Meteor } from 'meteor/meteor';
 
 import PersonCard from './PersonCard';
 
 export const PeopleList = ({ selectedEvent }) => {
-  const [people, setPeople] = useState([]);
-
-  useEffect(() => {
-    // Fetch people data from the People collection based on the selected event
-    const fetchPeople = async () => {
-      const peopleData = People.find({ eventId: selectedEvent._id }).fetch();
-      setPeople(peopleData);
-    };
-
+  const people = useTracker(() => {
     if (selectedEvent) {
-      fetchPeople();
+      const handler = Meteor.subscribe('people', selectedEvent._id);
+      if (handler.ready()) {
+        return People.find({ communityId: selectedEvent._id }).fetch();
+      }
     }
+    return [];
   }, [selectedEvent]);
 
   return (
