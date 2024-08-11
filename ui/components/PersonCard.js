@@ -8,21 +8,31 @@ export const PersonCard = ({ person }) => {
 
   useEffect(() => {
     setCheckedIn(!!person.checkInDate && !person.checkOutDate);
-    setCheckInTime(person.checkInDate ? new Date(person.checkInDate) : null);
+    const initialCheckInTime = person.checkInDate
+      ? new Date(person.checkInDate)
+      : null;
+    setCheckInTime(initialCheckInTime);
 
-    if (person.checkInDate && !person.checkOutDate) {
-      const interval = setInterval(() => {
-        const now = new Date();
-        const timeElapsed = Math.floor(
-          (now - new Date(person.checkInDate)) / 1000
-        );
-        setElapsedTime(timeElapsed);
-      }, 1000);
+    if (initialCheckInTime && !person.checkOutDate) {
+      const timeElapsedSinceCheckIn = Math.floor(
+        (new Date() - initialCheckInTime) / 1000
+      );
 
-      return () => clearInterval(interval); // Cleanup the interval on component unmount
+      if (timeElapsedSinceCheckIn > 5) {
+        setElapsedTime(6); // Set to 6 to immediately enable the "Check-out" button
+      } else {
+        setElapsedTime(timeElapsedSinceCheckIn);
+        const interval = setInterval(() => {
+          setElapsedTime((prevElapsedTime) => prevElapsedTime + 1);
+        }, 1000);
+
+        return () => clearInterval(interval); // Cleanup the interval on component unmount
+      }
+    } else {
+      setElapsedTime(0); // Reset elapsed time when the person is checked out
     }
-    setElapsedTime(0); // Reset elapsed time when the person is checked out
-    return undefined; // Explicitly return undefined when no interval is set
+
+    return undefined; // Explicitly return undefined when no cleanup is needed
   }, [person]);
 
   const handleCheckIn = () => {
@@ -31,6 +41,7 @@ export const PersonCard = ({ person }) => {
       if (!error) {
         setCheckedIn(true);
         setCheckInTime(currentTime);
+        setElapsedTime(0); // Reset the timer when checked in
       }
     });
   };
