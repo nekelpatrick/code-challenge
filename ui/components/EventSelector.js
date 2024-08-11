@@ -1,17 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useTracker } from 'meteor/react-meteor-data';
+import { Meteor } from 'meteor/meteor';
 import { Communities } from '../../communities/communities';
 
 export const EventSelector = ({ setSelectedEvent }) => {
-  const [events, setEvents] = useState([]);
-
-  useEffect(() => {
-    // Fetch events from the Communities collection
-    const fetchEvents = async () => {
-      const eventsData = Communities.find().fetch(); // Fetch all events
-      setEvents(eventsData);
-    };
-
-    fetchEvents();
+  const events = useTracker(() => {
+    Meteor.subscribe('communities');
+    return Communities.find().fetch();
   }, []);
 
   const handleSelect = (event) => {
