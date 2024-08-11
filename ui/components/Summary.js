@@ -8,20 +8,16 @@ export const Summary = ({ selectedEvent }) => {
     if (selectedEvent) {
       Meteor.subscribe('people', selectedEvent._id);
 
-      // Fetch the people data associated with the selected event
       const peopleData = People.find({
         communityId: selectedEvent._id,
       }).fetch();
 
-      // Calculate the number of people currently checked in
       const peopleCheckedIn = peopleData.filter(
         (person) => person.checkInDate && !person.checkOutDate
       ).length;
 
-      // Calculate the number of people not checked in
       const peopleNotCheckedIn = peopleData.length - peopleCheckedIn;
 
-      // Group people by company who are currently checked in
       const peopleByCompany = peopleData.reduce((acc, person) => {
         if (person.checkInDate && !person.checkOutDate) {
           const company = person.companyName || 'N/A';
@@ -43,10 +39,9 @@ export const Summary = ({ selectedEvent }) => {
     };
   }, [selectedEvent]);
 
-  // Helper function to render the companies and their counts
   const renderCompanies = () =>
     Object.entries(summary.peopleByCompany)
-      .map(([company, count]) => `${company} (${count})`)
+      .map(([company, count]) => `${company || 'N/A'} (${count})`)
       .join(', ');
 
   return (

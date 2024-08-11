@@ -6,10 +6,8 @@ export const PersonCard = ({ person }) => {
   const [checkInTime, setCheckInTime] = useState(null);
 
   useEffect(() => {
-    if (person.checkInDate) {
-      setCheckedIn(true);
-      setCheckInTime(new Date(person.checkInDate));
-    }
+    setCheckedIn(!!person.checkInDate && !person.checkOutDate);
+    setCheckInTime(person.checkInDate ? new Date(person.checkInDate) : null);
   }, [person]);
 
   const handleCheckIn = () => {
