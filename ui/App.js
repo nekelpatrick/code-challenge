@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import EventSelector from './components/EventSelector';
-import PeopleList from './components/PeopleList';
-import Summary from './components/Summary';
+import { EventSelector } from './components/EventSelector';
+import { PeopleList } from './components/PeopleList';
+import { Summary } from './components/Summary';
 
 export const App = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
