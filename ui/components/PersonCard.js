@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Meteor } from 'meteor/meteor';
 
 export const PersonCard = ({ person }) => {
   const [checkedIn, setCheckedIn] = useState(false);
@@ -12,15 +13,22 @@ export const PersonCard = ({ person }) => {
   }, [person]);
 
   const handleCheckIn = () => {
-    // Simulating a check-in
-    setCheckedIn(true);
-    setCheckInTime(new Date());
+    const currentTime = new Date();
+    Meteor.call('people.checkIn', person._id, currentTime, (error) => {
+      if (!error) {
+        setCheckedIn(true);
+        setCheckInTime(currentTime);
+      }
+    });
   };
 
   const handleCheckOut = () => {
-    // Simulating a check-out
-    setCheckedIn(false);
-    setCheckInTime(null);
+    Meteor.call('people.checkOut', person._id, (error) => {
+      if (!error) {
+        setCheckedIn(false);
+        setCheckInTime(null);
+      }
+    });
   };
 
   const formatDateTime = (date) => {

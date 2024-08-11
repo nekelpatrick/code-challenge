@@ -13,12 +13,13 @@ export const Summary = ({ selectedEvent }) => {
         }).fetch();
 
         const peopleCheckedIn = peopleData.filter(
-          (person) => person.checkInDate
+          (person) => person.checkInDate && !person.checkOutDate
         ).length;
+
         const peopleNotCheckedIn = peopleData.length - peopleCheckedIn;
 
         const peopleByCompany = peopleData.reduce((acc, person) => {
-          if (person.checkInDate) {
+          if (person.checkInDate && !person.checkOutDate) {
             acc[person.companyName] = (acc[person.companyName] || 0) + 1;
           }
           return acc;
