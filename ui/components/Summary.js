@@ -37,7 +37,7 @@ export const Summary = ({ selectedEvent }) => {
       peopleByCompany: {},
       peopleNotCheckedIn: 0,
     };
-  }, [selectedEvent]);
+  }, [selectedEvent, People.find({ communityId: selectedEvent?._id }).count()]);
 
   const renderCompanies = () =>
     Object.entries(summary.peopleByCompany)

@@ -4,10 +4,25 @@ import { Meteor } from 'meteor/meteor';
 export const PersonCard = ({ person }) => {
   const [checkedIn, setCheckedIn] = useState(false);
   const [checkInTime, setCheckInTime] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   useEffect(() => {
     setCheckedIn(!!person.checkInDate && !person.checkOutDate);
     setCheckInTime(person.checkInDate ? new Date(person.checkInDate) : null);
+
+    if (person.checkInDate && !person.checkOutDate) {
+      const interval = setInterval(() => {
+        const now = new Date();
+        const timeElapsed = Math.floor(
+          (now - new Date(person.checkInDate)) / 1000
+        );
+        setElapsedTime(timeElapsed);
+      }, 1000);
+
+      return () => clearInterval(interval); // Cleanup the interval on component unmount
+    }
+    setElapsedTime(0); // Reset elapsed time when the person is checked out
+    return undefined; // Explicitly return undefined when no interval is set
   }, [person]);
 
   const handleCheckIn = () => {
@@ -25,18 +40,18 @@ export const PersonCard = ({ person }) => {
       if (!error) {
         setCheckedIn(false);
         setCheckInTime(null);
+        setElapsedTime(0);
       }
     });
   };
 
   const formatDateTime = (date) => {
     if (!date) return 'N/A';
-    return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+    return `${date.toLocaleDateString('en-US')} ${date.toLocaleTimeString('en-US')}`;
   };
 
   const renderButton = () => {
-    const fiveSecondsAgo = new Date(Date.now() - 5000);
-    if (checkedIn && checkInTime > fiveSecondsAgo) {
+    if (checkedIn && elapsedTime > 5) {
       return (
         <button
           className="bg-red-500 px-4 py-2 text-white"
@@ -46,16 +61,19 @@ export const PersonCard = ({ person }) => {
         </button>
       );
     }
+
     if (checkedIn) {
       return (
         <button
-          className="bg-red-500 px-4 py-2 text-white"
-          onClick={handleCheckOut}
+          className="cursor-not-allowed bg-gray-400 px-4 py-2 text-white"
+          disabled
         >
-          Check-out {person.firstName} {person.lastName}
+          Check-out {person.firstName} {person.lastName} (Available in{' '}
+          {5 - elapsedTime}s)
         </button>
       );
     }
+
     return (
       <button
         className="bg-green-500 px-4 py-2 text-white"
