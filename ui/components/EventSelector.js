@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { Communities } from '../../communities/communities';
 
 export const EventSelector = ({ setSelectedEvent }) => {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    // Fetch events from the database (dummy data used here)
+    // Fetch events from the Communities collection
     const fetchEvents = async () => {
-      // Simulating a database fetch with dummy data
-      const dummyEvents = [
-        { _id: '1', name: 'Tech Conference 2024' },
-        { _id: '2', name: 'Music Festival' },
-      ];
-      setEvents(dummyEvents);
+      const eventsData = Communities.find().fetch(); // Fetch all events
+      setEvents(eventsData);
     };
 
     fetchEvents();

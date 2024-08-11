@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { People } from '../../people/people';
 
 export const Summary = ({ selectedEvent }) => {
   const [summary, setSummary] = useState({
@@ -8,22 +9,31 @@ export const Summary = ({ selectedEvent }) => {
   });
 
   useEffect(() => {
-    // Fetch summary data from the database based on the selected event
-    const fetchSummary = async () => {
-      // Simulating a database fetch with dummy data
-      const dummySummary = {
-        peopleCheckedIn: 10,
-        peopleByCompany: {
-          'Green Group': 10,
-          'Hoppe Group': 5,
-        },
-        peopleNotCheckedIn: 200,
-      };
-      setSummary(dummySummary);
+    // Calculate summary data from the People collection based on the selected event
+    const calculateSummary = async () => {
+      const peopleData = People.find({ eventId: selectedEvent._id }).fetch();
+
+      const peopleCheckedIn = peopleData.filter(
+        (person) => person.checkInDate
+      ).length;
+      const peopleNotCheckedIn = peopleData.length - peopleCheckedIn;
+
+      const peopleByCompany = peopleData.reduce((acc, person) => {
+        if (person.checkInDate) {
+          acc[person.company] = (acc[person.company] || 0) + 1;
+        }
+        return acc;
+      }, {});
+
+      setSummary({
+        peopleCheckedIn,
+        peopleByCompany,
+        peopleNotCheckedIn,
+      });
     };
 
     if (selectedEvent) {
-      fetchSummary();
+      calculateSummary();
     }
   }, [selectedEvent]);
 
